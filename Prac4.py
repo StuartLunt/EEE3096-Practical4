@@ -81,7 +81,6 @@ def temp_convert(a):
 def light_convert(a):
     max = 800
     min = 0
-    
     percent = a*(1/8)
     
     return percent
