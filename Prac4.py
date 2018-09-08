@@ -64,13 +64,39 @@ GPIO.add_event_detect(switch3, GPIO.FALLING, callback=stop, bouncetime=200)
 GPIO.add_event_detect(switch4, GPIO.FALLING, callback=display, bouncetime=200)
 
 
+# Potentiometer Voltage
+def pot_reading(a):
+    V = a*3.3/1023
+    
+    return V
 
+# Temperature Sesing
+def temp_convert(a):
+    Vo = a *3.3/1023
+    Ta = (Vo-0.5)/0.01
+    
+    return Ta
 
+# Light Sesing
+def light_convert(a):
+    max = 800
+    min = 0
+    
+    percent = a*(1/8)
+    
+    return percent
 
 
 while True:
     for i in range(8):
         values[i] = mcp.read_adc(i)
-time.sleep(0.5)
-print(values)
-
+    time.sleep(0.5)
+    #pot = pot_reading(values[0])
+    #print(pot)
+    
+    #temp = temp_convert(values[1])
+    #print(temp)
+    
+    #light = light_convert(values[2])
+    #print(light)
+    
