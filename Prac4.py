@@ -9,6 +9,7 @@ spi.open(0,0)
 startTime = time.time()
 period = 0.5
 run = True
+currenttime = time.strftime("%H:%M:%S", time.localtime())
 
 #Set up GPIO
 GPIO.setmode(GPIO.BCM)
@@ -55,7 +56,6 @@ def stop(channel):
 
 def display(channel):
     #display last 5
-    currenttime = time.strftime("%H:%M:%S", time.localtime())
 
 #Event detection set up
 GPIO.add_event_detect(switch1, GPIO.FALLING, callback=reset, bouncetime=200)
@@ -64,13 +64,6 @@ GPIO.add_event_detect(switch3, GPIO.FALLING, callback=stop, bouncetime=200)
 GPIO.add_event_detect(switch4, GPIO.FALLING, callback=display, bouncetime=200)
 
 
-
-
-
-
-while True:
-    for i in range(8):
-        values[i] = mcp.read_adc(i)
-time.sleep(0.5)
-print(values)
-
+for i in range(0,6):
+    print(currenttime)
+    time.sleep(period)
