@@ -12,6 +12,9 @@ startTime = time.time()
 period = 0.5
 run = True
 pause = Event()
+pot = 0
+temp = 0
+light = 0
 timeArray=[]
 timerArray=[]
 potArray=[]
@@ -112,13 +115,13 @@ while True:
     for i in range(8):
         values[i] = mcp.read_adc(i)
     time.sleep(0.5)
-    #pot = pot_reading(values[0])
+    pot = pot_reading(values[0])
     #print(pot)
     
-    #temp = temp_convert(values[1])
+    temp = temp_convert(values[1])
     #print(temp)
     
-    #light = light_convert(values[2])
+    light = light_convert(values[2])
     #print(light)
     
 while run:
@@ -130,8 +133,8 @@ while run:
         lightArray[i+1]=lightArray[i]
     timeArray[0]=currentTime()
     timerArray[0]=timerString()
-    #potArray[0]=
-    #tempArray[0]=
-    #lightArray[0]=
+    potArray[0]=pot_reading(pot)
+    tempArray[0]=temp_convert(temp)
+    lightArray[0]=light_convert(light)
     pause.wait(period)
 
