@@ -113,13 +113,8 @@ while True:
         values[i] = mcp.read_adc(i)
     time.sleep(period)
     pot = pot_reading(values[0])
-    #print(pot)
-    
     temp = temp_convert(values[1])
-    #print(temp)
-    
     light = light_convert(values[2])
-    #print(light)
     
 while run:
     for i in range(0,4):
@@ -130,7 +125,7 @@ while run:
         lightArray[i+1]=lightArray[i]
     timeArray[0]=currentTime()
     timerArray[0]=timerString()
-    potArray[0]=pot_reading(pot)
-    tempArray[0]=temp_convert(temp)
-    lightArray[0]=light_convert(light)
+    potArray[0]=pot
+    tempArray[0]=temp
+    lightArray[0]=light
     time.sleep(period)
