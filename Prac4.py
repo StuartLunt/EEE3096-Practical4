@@ -62,14 +62,15 @@ def stop(channel):
     run = not run
 
 def display(channel):
-    dummy = 0
-    #display last 5
+    print("Time \t Timer \t Pot \t Temp \t Light")
+    for i in range(0,5):
+        print("{t} \t {tmr} \t {pot} V \t {tmp} C \t {ldr} %".format(t=timeArray[i], tmr=timeArray[i], pot=potArray[i], tmp=tempArray[i], ldr=lightArray[i]))
     
 def currentTime():
     return time.strftime("%H:%M:%S", time.localtime())
 
 def timer():
-    sec=seconds=time.time()-startTime
+    sec=time.time()-startTime
     return sec
 
 def timerString():
@@ -86,5 +87,15 @@ GPIO.add_event_detect(switch4, GPIO.FALLING, callback=display, bouncetime=200)
 
 
 while run:
-    print(currentTime()+"\t"+timerString())
+    for i in range(0,4):
+        timeArray[i+1]=timeArray[i]
+        timerArray[i+1]=timerArray[i]
+        potArray[i+1]=potArray[i]
+        tempArray[i+1]=tempArray[i]
+        lightArray[i+1]=lightArray[i]
+    timeArray[0]=currentTime()
+    timerArray[0]=timerString()
+    #potArray[0]=
+    #tempArray[0]=
+    #lightArray[0]=
     pause.wait(period)
