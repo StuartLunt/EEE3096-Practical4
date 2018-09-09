@@ -44,8 +44,7 @@ GPIO.setup(switch2, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(switch3, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(switch4, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-
-
+#Main function
 mcp = Adafruit_MCP3008.MCP3008(clk=SPICLK, cs=SPICS, mosi=SPIMOSI, miso=SPIMISO)
 values=[0]*8
 
