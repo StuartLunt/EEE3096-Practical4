@@ -1,5 +1,7 @@
 import RPi.GPIO as GPIO
 import Adafruit_MCP3008, time, os, sys, spidev
+from datetime import datetime, timedelta
+from threading import Event
 
 #Open SPI bus
 spi=spidev.SpiDev()
@@ -9,6 +11,12 @@ spi.open(0,0)
 startTime = time.time()
 period = 0.5
 run = True
+pause = Event()
+timeArray=[]
+timerArray=[]
+potArray=[]
+tempArray=[]
+lightArray=[]
 
 #Set up GPIO
 GPIO.setmode(GPIO.BCM)
@@ -40,7 +48,7 @@ values=[0]*8
 
 def reset(channel):
     os.system('clear')
-    #Reset timer
+    startTime = time.time()
 
 def frequency(channel):
     if period == 0.5 :
@@ -54,8 +62,22 @@ def stop(channel):
     run = not run
 
 def display(channel):
-    #display last 5
-    currenttime = time.strftime("%H:%M:%S", time.localtime())
+    print("Time \t Timer \t Pot \t Temp \t Light")
+    for i in range(0,5):
+        print("{t} \t {tmr} \t {pot} V \t {tmp} C \t {ldr} %".format(t=timeArray[i], tmr=timeArray[i], pot=potArray[i], tmp=tempArray[i], ldr=lightArray[i]))
+    
+def currentTime():
+    return time.strftime("%H:%M:%S", time.localtime())
+
+def timer():
+    sec=time.time()-startTime
+    return sec
+
+def timerString():
+    sec=timedelta(seconds=time.time()-startTime)
+    d=datetime(1,1,1)+sec
+    s=str(d.hour)+":"+str(d.minute)+":"+str(d.second)
+    return s
 
 #Event detection set up
 GPIO.add_event_detect(switch1, GPIO.FALLING, callback=reset, bouncetime=200)
@@ -99,3 +121,17 @@ while True:
     #light = light_convert(values[2])
     #print(light)
     
+while run:
+    for i in range(0,4):
+        timeArray[i+1]=timeArray[i]
+        timerArray[i+1]=timerArray[i]
+        potArray[i+1]=potArray[i]
+        tempArray[i+1]=tempArray[i]
+        lightArray[i+1]=lightArray[i]
+    timeArray[0]=currentTime()
+    timerArray[0]=timerString()
+    #potArray[0]=
+    #tempArray[0]=
+    #lightArray[0]=
+    pause.wait(period)
+
