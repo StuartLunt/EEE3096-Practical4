@@ -90,22 +90,22 @@ GPIO.add_event_detect(switch4, GPIO.FALLING, callback=display, bouncetime=200)
 
 # Potentiometer Voltage
 def pot_reading(a):
-    V = a*3.3/1023
+    V = a*3.3/1023  # ADC outputs values between 0 and 1023 so this converts ADC value to a voltage
     
     return V
 
 # Temperature Sesing
 def temp_convert(a):
-    Vo = a *3.3/1023
-    Ta = (Vo-0.5)/0.01
+    Vo = a *3.3/1023 # ADC outputs values between 0 and 1023 so this converts ADC value to a voltage
+    Ta = (Vo-0.5)/0.01 # Ambient temperature formula
     
     return Ta
 
 # Light Sesing
 def light_convert(a):
-    max = 800
-    min = 0
-    percent = a*(1/8)
+    # The max value read by the ADC when a cellphone light was shone on it was 800 
+    # The minimum value read by the ADC was zero when the LDR was put in complete darkness
+    percent = a*(1/8) # Approximating light percentage by a straight line
     
     return percent
 
