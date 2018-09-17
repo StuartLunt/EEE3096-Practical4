@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import RPi.GPIO as GPIO
 import Adafruit_MCP3008, time, os, sys, spidev
 from datetime import datetime, timedelta
@@ -8,18 +9,24 @@ spi=spidev.SpiDev()
 spi.open(0,0)
 
 #initialise variables
-startTime = time.time()
+global startTime
+startTime=time.time()
+global period
 period = 0.5
+global run
 run = True
 pause = Event()
 pot = 0
 temp = 0
 light = 0
-timeArray=[]
-timerArray=[]
-potArray=[]
-tempArray=[]
-lightArray=[]
+global timeArray, timerArray, potArray, tempArray, lightArray
+timeArray=[0,0,0,0,0,0]
+timerArray=[0,0,0,0,0,0]
+potArray=[0,0,0,0,0,0]
+tempArray=[0,0,0,0,0,0]
+lightArray=[0,0,0,0,0,0]
+GPIO.setwarnings(False)
+print("Time \t     Timer \t  Pot \t  Temp \t Light")
 
 #Set up GPIO
 GPIO.setmode(GPIO.BCM)
@@ -49,11 +56,13 @@ mcp = Adafruit_MCP3008.MCP3008(clk=SPICLK, cs=SPICS, mosi=SPIMOSI, miso=SPIMISO)
 values=[0]*8
 
 def reset(channel):
+    global startTime
     os.system('clear')
     startTime = time.time()
 
 def frequency(channel):
-    if period == 0.5 :
+    global period
+    if period == 0.5:
         period=1
     elif period == 1:
         period = 2
@@ -61,12 +70,27 @@ def frequency(channel):
         period = 0.5
 
 def stop(channel):
+    global run, timeArray, timerArray, potArray, tempArray, lightArray, period
     run = not run
+    for j in range(0,5):
+        for i in range(8):
+            values[i] = mcp.read_adc(i)
+        pot = pot_reading(values[0])
+        temp = temp_convert(values[1])
+        light = light_convert(values[2])
+        
+        timeArray[j]=currentTime()
+        timerArray[j]=timerString()
+        potArray[j]=pot
+        tempArray[j]=temp
+        lightArray[j]=light
+        time.sleep(period)
+        
 
 def display(channel):
-    print("Time \t Timer \t Pot \t Temp \t Light")
+    print("Time \t     Timer \t  Pot \t  Temp \t Light")
     for i in range(0,5):
-        print("{t} \t {tmr} \t {pot} V \t {tmp} C \t {ldr} %".format(t=timeArray[i], tmr=timeArray[i], pot=potArray[i], tmp=tempArray[i], ldr=lightArray[i]))
+        print("{0:10} {1:6} {2:5}V, {3:4}C, {4:4}%".format(timeArray[i], timerArray[i], potArray[i], tempArray[i], lightArray[i]))
     
 def currentTime():
     return time.strftime("%H:%M:%S", time.localtime())
@@ -76,6 +100,7 @@ def timer():
     return sec
 
 def timerString():
+    global startTime
     sec=timedelta(seconds=time.time()-startTime)
     d=datetime(1,1,1)+sec
     s=str(d.hour)+":"+str(d.minute)+":"+str(d.second)
@@ -92,42 +117,34 @@ GPIO.add_event_detect(switch4, GPIO.FALLING, callback=display, bouncetime=200)
 def pot_reading(a):
     V = a*3.3/1023  # ADC outputs values between 0 and 1023 so this converts ADC value to a voltage
     
-    return V
+    return round(V,1)
 
 # Temperature Sesing
 def temp_convert(a):
     Vo = a *3.3/1023 # ADC outputs values between 0 and 1023 so this converts ADC value to a voltage
     Ta = (Vo-0.5)/0.01 # Ambient temperature formula
     
-    return Ta
+    return round(Ta)
 
 # Light Sesing
 def light_convert(a):
     # The max value read by the ADC when a cellphone light was shone on it was 800 
     # The minimum value read by the ADC was zero when the LDR was put in complete darkness
-    percent = a*(1/8) # Approximating light percentage by a straight line
+    if a >= 800:
+        percent = 100
+    else:
+        percent = a*(1/8) # Approximating light percentage by a straight line
     
-    return percent
-
+    return round(percent)
 
 while True:
-    for i in range(8):
-        values[i] = mcp.read_adc(i)
-    time.sleep(period)
-    pot = pot_reading(values[0])
-    temp = temp_convert(values[1])
-    light = light_convert(values[2])
-    
-while run:
-    for i in range(0,4):
-        timeArray[i+1]=timeArray[i]
-        timerArray[i+1]=timerArray[i]
-        potArray[i+1]=potArray[i]
-        tempArray[i+1]=tempArray[i]
-        lightArray[i+1]=lightArray[i]
-    timeArray[0]=currentTime()
-    timerArray[0]=timerString()
-    potArray[0]=pot
-    tempArray[0]=temp
-    lightArray[0]=light
-    time.sleep(period)
+    while run:
+        for i in range(8):
+            values[i] = mcp.read_adc(i)
+        pot = pot_reading(values[0])
+        temp = temp_convert(values[1])
+        light = light_convert(values[2])
+        
+        print("{0:10} {1:6} {2:5}V, {3:4}C, {4:4}%".format(currentTime(), timerString(), pot,temp,light))
+
+        time.sleep(period)
